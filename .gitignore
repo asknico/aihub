@@ -1,14 +1,27 @@
 # ==================================================
-# AIHub Local / Runtime
+# AIHub Local / Runtime（本机私有，整个目录不进版本库）
 # ==================================================
 
 /local/*
 !/local/README.md
 
+# 外部运行时目录优先放仓库外：C:/AIHubData（见 .env.example）
 /runtime/*
 
-# External runtime directory should preferably be:
-# C:/AIHubData
+# ==================================================
+# Generated artifacts（生成物：脚本生成，禁止手工编辑）
+# 依据：根 AGENTS.md §7.1
+# ==================================================
+
+# 纯派生视图：git ls-files / tree 命令随时可重现，入库只有 diff 噪音
+/AIHUB_TREE.txt
+
+# 根目录副本与 docs/AIHUB_STRUCTURE.md 重复且已各自漂移，
+# 唯一入库的结构文档是 docs/AIHUB_STRUCTURE.md
+/AIHUB_STRUCTURE.md
+
+# 注意：registry/*.yaml 同为生成物，但属于分发产物（克隆即用），
+# 仍然入库；纪律是只能由 scripts/sync.py 重新生成，不手工编辑。
 
 # ==================================================
 # Environment
@@ -45,11 +58,26 @@ id_ecdsa
 id_ed25519
 
 # ==================================================
-# Python
+# MCP
 # ==================================================
 
-# scripts/ 下都是 Python。py_compile / compileall / import 都会就地生成
-# __pycache__，属于构建产物，不入库（AGENTS.md §1.7 运行时隔离）。
+# mcp.json 是本机装配产物（含真实连接信息/密钥），只提交 example
+/mcp/mcp.json
+mcp.local.json
+*.mcp.local.json
+
+# ==================================================
+# Local overrides（任何层级的 .local.* 都是本机覆盖，不入库）
+# ==================================================
+
+*.local.yaml
+*.local.yml
+*.local.json
+
+# ==================================================
+# Python（scripts/ 运行产物）
+# ==================================================
+
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -58,7 +86,7 @@ __pycache__/
 venv/
 
 # ==================================================
-# Agent runtime
+# Agent runtime 产物（会话/缓存/日志/临时文件，任何层级）
 # ==================================================
 
 **/.cache/
@@ -69,66 +97,26 @@ venv/
 **/logs/
 **/tmp/
 **/temp/
+*.log
 
 # ==================================================
-# Agent 技能目录联接（install.py 生成）
+# Agent 技能目录联接（install.py 生成的本机装配结果）
 # ==================================================
 
-# agents/<id>/skills 是指向 shared/skills 的目录联接，由
-# `python3 scripts/install.py` 第 5 步按 registry/agents.yaml 中
-# skillMode: symlink 的登记项建立。
-#
-# 它不是源码，而是本机运行时的装配结果：
-#   1. shared/skills 才是唯一事实源，提交联接等于把同一份技能在库里存三遍，
-#      并且让 git add 的换行符告警按 Agent 数量成倍增长；
-#   2. 目录联接无法跨平台还原 —— Windows 用 junction，macOS/Linux 用 symlink，
-#      把它当普通目录提交，克隆到别的系统上会变成一份静态副本，
-#      此后「改 shared/skills 自动生效」的语义就静默失效了。
-#
-# 克隆后重新装配：python3 scripts/install.py
 /agents/*/skills
 
 # ==================================================
-# MCP Local
-# ==================================================
-
-mcp.local.json
-*.mcp.local.json
-
-# ==================================================
-# Local overrides
-# ==================================================
-
-*.local.yaml
-*.local.yml
-*.local.json
-
-# ==================================================
-# IDE
+# IDE / OS
+# 注意：必须写 .vscode/* 而不是 .vscode/ ——
+# git 规则是「父目录被排除后，其中的文件无法被重新包含」，
+# 写 .vscode/ 会让下面的 !.vscode/settings.json.example 永远失效
 # ==================================================
 
 .idea/
-.vscode/
+.vscode/*
+!.vscode/settings.json.example
 *.iml
-
-# Editor / OS cruft
 .DS_Store
 Thumbs.db
 *.swp
 *.swo
-.idea/
-.vscode/
-!.vscode/settings.json.example
-
-# ==================================================
-# OS
-# ==================================================
-
-.DS_Store
-Thumbs.db
-
-# ==================================================
-# Logs
-# ==================================================
-
-*.log
