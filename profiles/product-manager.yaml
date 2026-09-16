@@ -1,0 +1,26 @@
+name: product-manager
+
+# 只允许引用「实际存在且非空」的目标（AGENTS.md §4）。
+# 生效中：0 条 L1 规则（该角色所需的产品域规则尚未建立）+ 1 个技能。
+# 目前仅由 L0（common/general.md）兜底 —— 本档是骨架，不是可用的完整角色档。
+
+skills:
+  - create-plan
+
+rules:
+  # L0 常驻（AGENTS.md §2，不计入 L1 预算）
+  - common/general.md
+
+# =============================================================================
+# 待实现 —— 产品域规则与技能整体缺失，需要先按 AGENTS.md §3 确定归属位置。
+# =============================================================================
+#
+# skills:
+#   - prd-review             shared/skills/product/prd-review/            无 SKILL.md
+#   - requirement-analysis   shared/skills/product/requirement-analysis/  无 SKILL.md
+#
+# rules:（以下路径均不存在，需先确定产品域规则的归属域）
+#   - product/requirement.md      目录不存在
+#   - product/prd.md              目录不存在
+#   - common/documentation.md     0 B
+#   - common/communication.md     0 B

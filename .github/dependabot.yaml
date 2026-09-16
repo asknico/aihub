@@ -1,0 +1,42 @@
+# ==========================================================================
+# dependabot —— 依赖更新
+# ==========================================================================
+# 文件位置固定为 .github/dependabot.yml（或 .yaml），放在别处不生效。
+#
+# 只登记仓库里真实存在的生态。当前只有 GitHub Actions：
+#   .github/workflows/*.yaml 引用了 actions/checkout 与 actions/setup-python。
+#
+# 刻意不登记 pip：仓库目前没有 requirements.txt / pyproject.toml，
+# PyYAML 只在 CI 与本地按需安装。凭空声明一个不存在的 manifest 只会
+# 让 dependabot 每次运行都报「未找到依赖文件」。等仓库真的引入
+# requirements.txt 时，再把下面的 pip 段取消注释。
+# ==========================================================================
+
+version: 2
+
+updates:
+  # ------------------------------------------------------------------------
+  # GitHub Actions —— 让 workflow 里引用的 action 跟上新版本
+  # ------------------------------------------------------------------------
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Shanghai
+    open-pull-requests-limit: 3
+    commit-message:
+      # 与 CI 改动区分开，便于按前缀筛选提交历史
+      prefix: "chore(ci)"
+
+  # ------------------------------------------------------------------------
+  # Pip —— 待仓库引入依赖清单后启用
+  # ------------------------------------------------------------------------
+  # - package-ecosystem: pip
+  #   directory: "/"
+  #   schedule:
+  #     interval: weekly
+  #   open-pull-requests-limit: 3
+  #   commit-message:
+  #     prefix: "chore(deps)"

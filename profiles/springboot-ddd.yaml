@@ -1,0 +1,55 @@
+name: springboot-ddd
+
+# 只允许引用「实际存在且非空」的目标（AGENTS.md §4）。
+# 生效中：5 条 L1 规则 ≈ 44.3 KB（L1 预算 ≤48 KB）+ 2 个技能。
+# 余量仅 ~3.7 KB —— 本档新增规则前，须先确认总字节数仍在上限内。
+
+skills:
+  - spring-boot-ddd
+  - java-code-review
+
+rules:
+  # L0 常驻（AGENTS.md §2，不计入 L1 预算）
+  - common/general.md
+
+  # Agent 行为
+  - ai/code-generation.md
+
+  # Java
+  - coding/java/java.md
+  - coding/java/naming.md
+
+  # Spring
+  - coding/spring/spring-boot.md
+
+  # Architecture
+  - architecture/ddd.md
+
+# =============================================================================
+# 待实现 —— 以下目标当前是空文件或不存在的目录，引用它们违反 AGENTS.md §7.5。
+# 括号内是实际状态；填写完成后再取消注释放回上方。
+# =============================================================================
+#
+# rules:
+#   - ai/agent-behavior.md                  0 B
+#   - ai/code-modification.md               0 B
+#   - coding/general.md                     0 B
+#   - coding/java/exception.md              0 B
+#   - coding/spring/dependency-injection.md 0 B
+#   - coding/spring/transaction.md          0 B
+#   - coding/spring/validation.md           0 B
+#   - architecture/hexagonal.md             0 B
+#   - architecture/dependency-rules.md      0 B
+#   - api/rest.md                           0 B
+#   - api/error-response.md                 0 B
+#   - api/idempotency.md                    0 B
+#   - database/schema-design.md             0 B
+#   - database/migration.md                 0 B
+#   - database/transaction.md               0 B
+#   - testing/unit-testing.md               0 B
+#   - testing/integration-testing.md        0 B
+#   - testing/testcontainers.md             0 B
+#   - security/general.md                   0 B
+#   - security/input-validation.md          0 B
+#   - security/secrets.md                   0 B
+#   - git/commit.md                         0 B

@@ -1,0 +1,38 @@
+# config/models.yaml
+# 模型偏好（Hub 级默认）。
+#
+# 红线：本文件禁止出现任何密钥值（根 AGENTS.md §12）。
+# 密钥一律间接引用 —— 只写环境变量名，真实值在仓库根目录 .env（不入版本库）。
+#
+# 「档位名」是 Hub 的稳定接口；具体型号随厂商更新，由各 Agent 适配器覆盖
+# （根 AGENTS.md §7：Agent 适配器可覆盖 Hub 默认值）。
+
+defaults:
+  api_key_env: ANTHROPIC_API_KEY
+
+tiers:
+  # 深度推理：架构评审、疑难调试、代码评审
+  reasoning:
+    api_key_env: ANTHROPIC_API_KEY
+    use_for:
+      - architecture-review
+      - debugging
+      - code-review
+
+  # 快速执行：格式化、文件操作、摘要
+  fast:
+    api_key_env: ANTHROPIC_API_KEY
+    use_for:
+      - formatting
+      - file-ops
+      - summarization
+
+  # 长上下文：大范围检索、跨文件分析
+  long_context:
+    api_key_env: ANTHROPIC_API_KEY
+    use_for:
+      - repo-wide-search
+      - cross-file-analysis
+
+# 其余可用密钥变量名见 .env.example（唯一键名清单，根 AGENTS.md §12）：
+# OPENAI_API_KEY / GITHUB_TOKEN

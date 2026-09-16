@@ -1,0 +1,30 @@
+skills:
+  java-code-review:
+    path: shared/skills/engineering/java-code-review
+    category: engineering
+    version: 1.0.0
+    visibility: public
+    agents:
+      codex: true
+      claude: true
+      cursor: true
+      deepseek: true
+    tags:
+      - java
+      - spring
+      - review
+
+  architecture-review:
+    path: shared/skills/engineering/architecture-review
+    category: architecture
+    version: 2.1.0
+    visibility: public
+    agents:
+      codex: true
+      claude: true
+      cursor: false
+      deepseek: false
+    tags:
+      - architecture
+      - microservice
+      - ddd

@@ -1,0 +1,37 @@
+# agents/_shared/agent-defaults.yaml
+# 所有 Agent 适配器的公共默认值。
+#
+# 契约：根 AGENTS.md §10（Agent 适配器契约）。
+# 各 Agent 的 config.yaml 只写与这里的差异项。
+# 本文件不针对任何具体 Agent，禁止在此写 Agent 专属路径。
+
+defaults:
+
+  # 入口指引：每个 Agent 目录下有一个入口文件（AGENTS.md / CLAUDE.md），
+  # 只引用根 AGENTS.md，禁止复制其条款（根 AGENTS.md §5.4）
+  entry:
+    must_read: ../../AGENTS.md
+    copy_policy: reference-only
+
+  # 共享技能的引用方式：目录联接，不是副本
+  skills:
+    mode: symlink
+    source: ../../shared/skills
+    generated: true             # 生成物，禁止在其中新增/修改/删除文件
+
+  # 规则加载：只加载 profile 圈定的规则
+  rules:
+    source: ../../shared/rules
+    load: profile-only
+    preload_all: false          # 禁止预加载整库（根 AGENTS.md §6）
+
+  # Agent 标识的唯一登记处
+  registry:
+    id_source: ../../registry/agents.yaml
+
+  runtime:
+    write_root: ../../runtime/  # 临时文件只写 runtime/（根 AGENTS.md §5 红线）
+    data_root_env: AIHUB_DATA
+
+  git:
+    commit_scope: single-intent # 一次提交只做一件事（根 AGENTS.md §13）

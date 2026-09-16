@@ -1,0 +1,26 @@
+# config/features.yaml
+# AIHub 功能开关。true = 启用，false = 关闭。
+#
+# 判据：只登记「有实现读取」的开关。
+# 实现未落地的一律 false 并注明状态 —— 禁止把未实现的能力标成 true
+# （根 AGENTS.md §15：不得在工具缺失或未执行的情况下宣称校验已通过）。
+
+features:
+
+  # --- 已落地 ---
+  skill_linking: true          # scripts/install.py   装配 agents/<id>/skills 目录联接
+  profile_validation: true     # scripts/install.py   校验角色档只引用非空目标
+  eol_policy_check: true       # scripts/fix-eol.py + .githooks/pre-commit
+  secret_name_guard: true      # .githooks/pre-commit 密钥文件名拦截
+  ci_validate: true            # .github/workflows/validate.yaml
+  ci_security_scan: true       # .github/workflows/security-scan.yaml
+
+  # --- 未落地：实现后再改为 true ---
+  registry_generation: false   # scripts/sync.py            0 字节
+  security_scan_deep: false    # scripts/security-check.py  0 字节
+  repo_doctor: false           # scripts/doctor.py          0 字节
+  repo_validate: false         # scripts/validate.py        0 字节
+  eol_autofix: false           # scripts/update.py          0 字节
+  project_scaffolding: false   # templates/ 为空
+  knowledge_layer: false       # shared/knowledge/ 为空
+  prompt_layer: false          # shared/prompts/ 为空

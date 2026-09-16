@@ -1,0 +1,134 @@
+# ==================================================
+# AIHub Local / Runtime
+# ==================================================
+
+/local/*
+!/local/README.md
+
+/runtime/*
+
+# External runtime directory should preferably be:
+# C:/AIHubData
+
+# ==================================================
+# Environment
+# ==================================================
+
+.env
+.env.*
+!.env.example
+
+# ==================================================
+# Secrets / Credentials
+# ==================================================
+
+# 按扩展名匹配：命中即视为凭据文件，无论在哪一层
+*.secret
+*.secrets
+*.credential
+*.credentials
+
+# 裸名 credentials.* / secrets.* 必须锚定到仓库根。
+# 不加斜杠会连 shared/rules/security/secrets.md 这类「讲密钥的规则文件」
+# 一起排除 —— 它们文件名相同但性质完全相反，是仓库的正常内容。
+/credentials.*
+/secrets.*
+
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+
+# ==================================================
+# Python
+# ==================================================
+
+# scripts/ 下都是 Python。py_compile / compileall / import 都会就地生成
+# __pycache__，属于构建产物，不入库（AGENTS.md §1.7 运行时隔离）。
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# ==================================================
+# Agent runtime
+# ==================================================
+
+**/.cache/
+**/cache/
+**/sessions/
+**/session/
+**/history/
+**/logs/
+**/tmp/
+**/temp/
+
+# ==================================================
+# Agent 技能目录联接（install.py 生成）
+# ==================================================
+
+# agents/<id>/skills 是指向 shared/skills 的目录联接，由
+# `python3 scripts/install.py` 第 5 步按 registry/agents.yaml 中
+# skillMode: symlink 的登记项建立。
+#
+# 它不是源码，而是本机运行时的装配结果：
+#   1. shared/skills 才是唯一事实源，提交联接等于把同一份技能在库里存三遍，
+#      并且让 git add 的换行符告警按 Agent 数量成倍增长；
+#   2. 目录联接无法跨平台还原 —— Windows 用 junction，macOS/Linux 用 symlink，
+#      把它当普通目录提交，克隆到别的系统上会变成一份静态副本，
+#      此后「改 shared/skills 自动生效」的语义就静默失效了。
+#
+# 克隆后重新装配：python3 scripts/install.py
+/agents/*/skills
+
+# ==================================================
+# MCP Local
+# ==================================================
+
+mcp.local.json
+*.mcp.local.json
+
+# ==================================================
+# Local overrides
+# ==================================================
+
+*.local.yaml
+*.local.yml
+*.local.json
+
+# ==================================================
+# IDE
+# ==================================================
+
+.idea/
+.vscode/
+*.iml
+
+# Editor / OS cruft
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+!.vscode/settings.json.example
+
+# ==================================================
+# OS
+# ==================================================
+
+.DS_Store
+Thumbs.db
+
+# ==================================================
+# Logs
+# ==================================================
+
+*.log

@@ -1,0 +1,34 @@
+rules:
+
+  java-core:
+    path: shared/rules/coding/java/java.md
+    category: coding
+    tags:
+      - java
+    priority: normal
+
+  spring-boot:
+    path: shared/rules/coding/spring/spring-boot.md
+    category: coding
+    tags:
+      - java
+      - spring
+    priority: normal
+
+  ddd:
+    path: shared/rules/architecture/ddd.md
+    category: architecture
+    tags:
+      - ddd
+      - architecture
+    priority: high
+
+  security-secrets:
+    path: shared/rules/security/secrets.md
+    category: security
+    priority: critical
+
+  agent-behavior:
+    path: shared/rules/ai/agent-behavior.md
+    category: ai
+    priority: critical

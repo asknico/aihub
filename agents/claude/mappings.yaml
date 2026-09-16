@@ -1,0 +1,10 @@
+skills:
+  source: ../../shared/skills
+  target: ~/.claude/skills
+
+rules:
+  source: ../../shared/rules
+  target: ~/.claude/rules
+
+prompts:
+  source: ../../shared/prompts

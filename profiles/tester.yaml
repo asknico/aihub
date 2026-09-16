@@ -1,0 +1,32 @@
+name: tester
+
+# 只允许引用「实际存在且非空」的目标（AGENTS.md §4）。
+# 生效中：0 条 L1 规则（测试域规则全部未填写）+ 0 个技能。
+# 目前仅由 L0（common/general.md）兜底 —— 本档是骨架，不是可用的完整角色档。
+
+skills:
+
+rules:
+  # L0 常驻（AGENTS.md §2，不计入 L1 预算）
+  - common/general.md
+
+# =============================================================================
+# 待实现 —— 测试域文件都已建目录但内容为空；技能目录存在却缺 SKILL.md。
+# =============================================================================
+#
+# skills:
+#   - unit-testing        shared/skills/testing/unit-testing/     无 SKILL.md
+#   - api-testing         shared/skills/testing/api-testing/      无 SKILL.md
+#   - test-case-design    shared/skills/testing/test-case-design/ 无 SKILL.md
+#
+# rules:
+#   - testing/general.md              0 B
+#   - testing/unit-testing.md         0 B
+#   - testing/integration-testing.md  0 B
+#   - testing/api-testing.md          0 B
+#   - testing/testcontainers.md       0 B
+#   - api/idempotency.md              0 B
+#   - api/error-response.md           0 B
+#   - database/transaction.md         0 B
+#   - security/input-validation.md    0 B
+#   - git/commit.md                   0 B

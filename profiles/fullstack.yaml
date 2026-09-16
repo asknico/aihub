@@ -1,0 +1,35 @@
+name: fullstack
+
+# 只允许引用「实际存在且非空」的目标（AGENTS.md §4）。
+# 生效中：2 条 L1 规则 ≈ 18.3 KB（L1 预算 ≤48 KB）+ 2 个技能。
+# 本档偏后端 —— 前端规则（coding/frontend/*）尚未填写，填好后应补回引用。
+
+skills:
+  - create-plan
+  - spring-boot
+
+rules:
+  # L0 常驻（AGENTS.md §2，不计入 L1 预算）
+  - common/general.md
+
+  # L1 场景规则
+  - coding/java/java.md
+  - coding/spring/spring-boot.md
+
+# =============================================================================
+# 待实现 —— 以下目标当前是空文件或不存在的目录，引用它们违反 AGENTS.md §7.5。
+# =============================================================================
+#
+# rules:
+#   - coding/general.md                     0 B
+#   - coding/frontend/typescript.md         0 B
+#   - coding/frontend/vue.md                0 B
+#   - coding/spring/transaction.md          0 B
+#   - coding/spring/dependency-injection.md 0 B
+#   - api/rest.md                           0 B
+#   - api/error-response.md                 0 B
+#   - database/general.md                   0 B
+#   - testing/general.md                    0 B
+#   - security/general.md                   0 B
+#   - git/commit.md                         0 B
+#   - ai/agent-behavior.md                  0 B

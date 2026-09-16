@@ -1,0 +1,45 @@
+name: java-developer
+
+# 只允许引用「实际存在且非空」的目标（AGENTS.md §4）。
+# 生效中：4 条 L1 规则 ≈ 35.2 KB（L1 预算 ≤48 KB）+ 2 个技能。
+# 尚未填写或不存在的目标一律注释保留在文件末尾，取消注释前必须先写好内容。
+
+skills:
+  - java-code-review
+  - spring-boot
+
+rules:
+  # L0 常驻（AGENTS.md §2，不计入 L1 预算）
+  - common/general.md
+
+  # L1 场景规则
+  - coding/java/java.md
+  - coding/java/naming.md
+  - coding/spring/spring-boot.md
+  - ai/code-generation.md
+
+# =============================================================================
+# 待实现 —— 以下目标当前是空文件或不存在的目录，引用它们违反 AGENTS.md §7.5。
+# 括号内是实际状态；填写完成后再取消注释放回上方。
+# =============================================================================
+#
+# skills:
+#   - database-design     shared/skills/engineering/database-design/SKILL.md  占位
+#   - unit-testing        shared/skills/testing/unit-testing/                无 SKILL.md
+#   - api-testing         shared/skills/testing/api-testing/                 无 SKILL.md
+#   - docker              shared/skills/devops/docker/                       无 SKILL.md
+#   - sql-review          目录不存在
+#   - git-workflow        目录不存在
+#
+# rules:
+#   - coding/general.md              0 B
+#   - coding/java/exception.md       0 B
+#   - coding/spring/transaction.md   0 B
+#   - api/rest.md                    0 B
+#   - database/general.md            0 B
+#   - testing/general.md             0 B
+#   - testing/unit-testing.md        0 B
+#   - security/general.md            0 B
+#   - security/secure-coding.md      0 B
+#   - git/commit.md                  0 B
+#   - ai/agent-behavior.md           0 B

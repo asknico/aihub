@@ -1,0 +1,18 @@
+# agents/deepseek/mappings.yaml
+# 本 Agent 的路径映射：把 Hub 的权威资产映射到 DeepSeek 工具链的原生查找路径。
+#
+# 契约：根 AGENTS.md §10 —— 只做映射声明，禁止复制内容。
+# 本 Agent 尚无 entry.file 定论，config.yaml 也未建；
+# 下方 target 为本机路径，启用同步前必须按实际安装位置核对。
+
+skills:
+  source: ../../shared/skills
+  target: ~/.deepseek/skills
+
+rules:
+  source: ../../shared/rules
+  target: ~/.deepseek/rules
+
+prompts:
+  source: ../../shared/prompts   # ⬜ shared/prompts/ 目前为空
+  target: ~/.deepseek/prompts

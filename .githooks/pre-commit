@@ -1,0 +1,159 @@
+#!/bin/sh
+# ==========================================================================
+# AIHub pre-commit 钩子
+# ==========================================================================
+#
+# 只做「已实现且廉价」的检查。宁可少查，也不要写一个看起来在把关、
+# 实际什么都不做的钩子 —— AGENTS.md §7.5 禁止把尚未实现的当成已生效。
+#
+# 当前检查
+#   1. 换行符策略  复用 scripts/fix-eol.py（策略唯一来源是 .gitattributes）
+#   2. 密钥类文件  拦截进入暂存区的密钥文件名（.gitignore 是预防，这里是兜底）
+#
+# 尚未接入的检查（对应脚本仍是 0 字节占位，实现后再加进来）
+#   · 规则文件 frontmatter 完整性          → scripts/validate.py
+#   · registry/*.yaml 与 frontmatter 一致性（生成物不得手改）→ scripts/sync.py
+#   · 密钥内容扫描（不只是文件名）          → scripts/security-check.py
+#
+# 启用方式（core.hooksPath 存在 .git/config 里，不随克隆分发，每台机器需设一次）
+#   git config core.hooksPath .githooks
+#
+# 紧急绕过
+#   git commit --no-verify
+#
+# 设计约束（踩过的坑，改动前先读）
+#   · POSIX sh。git 在各平台都用 sh 执行钩子：Windows 走 Git for Windows
+#     自带的 bash，macOS / Linux 走 /bin/sh。
+#   · 不依赖 grep / sed / awk 等外部命令。实测某些环境下钩子进程的 PATH
+#     里没有这些工具，一旦缺失，`cmd || true` 会把检查静默变成「通过」——
+#     即 fail-open。故一律用 shell 内建的 case / 参数展开。
+#   · 解释器探测必须真的跑一次版本判断，不能只看 `command -v` 是否命中：
+#     Windows 上 `python3` 常常是应用商店的占位存根，存在但不可用。
+# ==========================================================================
+
+set -u
+
+FAILED=0
+
+say() { printf '%s\n' "$*"; }
+
+# --------------------------------------------------------------------------
+# 定位仓库根并切进去
+# --------------------------------------------------------------------------
+if ! root=$(git rev-parse --show-toplevel 2>/dev/null); then
+    say "[pre-commit] 无法定位仓库根目录，跳过检查。"
+    exit 0
+fi
+cd "$root" || exit 0
+
+# --------------------------------------------------------------------------
+# 探测可用的 Python（>= 3.8）
+# --------------------------------------------------------------------------
+# 逐个候选真跑一次版本判断，失败就试下一个；全都不可用则留空。
+PY=""
+for candidate in python3 python py; do
+    command -v "$candidate" >/dev/null 2>&1 || continue
+    if "$candidate" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 8) else 1)' >/dev/null 2>&1; then
+        PY="$candidate"
+        break
+    fi
+done
+
+# --------------------------------------------------------------------------
+# 检查 1：换行符策略
+# --------------------------------------------------------------------------
+# 查的是整个工作区而不是只看暂存文件：CRLF 一旦进了索引，之后每次
+# git add 都会逐文件告警，并且「git 下次碰它」会整文件重写。整体保持干净
+# 才是这个检查真正想维持的状态。
+if [ -z "$PY" ]; then
+    say "[pre-commit] 未找到可用的 Python（需 3.8+），已跳过换行符策略检查。"
+elif [ ! -f scripts/fix-eol.py ]; then
+    say "[pre-commit] scripts/fix-eol.py 不存在，已跳过换行符策略检查。"
+else
+    if ! output=$("$PY" scripts/fix-eol.py 2>&1); then
+        say ""
+        say "======================================================"
+        say " pre-commit 阻断：换行符策略检查未通过"
+        say "======================================================"
+        say "$output"
+        say ""
+        say "修复：$PY scripts/fix-eol.py --write"
+        say "然后用 git add --renormalize . 让索引同步"
+        say "======================================================"
+        FAILED=1
+    fi
+fi
+
+# --------------------------------------------------------------------------
+# 检查 2：密钥类文件不得进入暂存区
+# --------------------------------------------------------------------------
+# 与 .gitignore 的分工：.gitignore 在 git add 阶段静默挡掉，但
+# `git add -f`、改名、或规则被误删时它会失效；钩子是最后一道。
+# 这里只看文件名 —— 内容级扫描交给 CI 的 gitleaks。
+#
+# 下面这份清单**刻意独立于 .gitignore**，不是抄它一份：
+# 两者是不同层面（.gitignore 管「不想入库」，钩子管「绝不能入库」），
+# 且钩子必须在 .gitignore 被改坏时仍然有效。CI 里的仓库守卫走的是另一条
+# 路子（git ls-files -i），三条互补而不是三份副本。
+staged=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null || true)
+
+hits=""
+if [ -n "$staged" ]; then
+    while IFS= read -r path; do
+        [ -n "$path" ] || continue
+        name=${path##*/}
+        reason=""
+
+        # 仓库根下的 credentials.* / secrets.*
+        # 必须用带斜杠的整路径匹配：只匹配裸名会把
+        # shared/rules/security/secrets.md 这类同名的规则文件一起误杀。
+        case "$path" in
+            credentials.*|secrets.*) reason="根目录下的密钥文件" ;;
+        esac
+
+        # 裸名匹配：以下名称无论放在哪一层都可疑
+        case "$name" in
+            .env)                     reason=".env 真实值不入库" ;;
+            .env.local|.env.dev|.env.development|.env.prod|.env.production|.env.staging|.env.uat|.env.test|.env.secret|.env.secrets|.env.private)
+                                      reason="环境变量真实值文件" ;;
+            *.pem|*.key|*.p12|*.pfx|*.jks|*.keystore|*.ppk)
+                                      reason="密钥/证书文件" ;;
+            *.secret|*.secrets|*.credential|*.credentials)
+                                      reason="凭据文件" ;;
+            id_rsa|id_dsa|id_ecdsa|id_ed25519)
+                                      reason="SSH 私钥" ;;
+            .mcp.local.json)          reason="本机 MCP 配置" ;;
+        esac
+
+        if [ -n "$reason" ]; then
+            hits="$hits  $path   （$reason）
+"
+        fi
+    done <<EOF
+$staged
+EOF
+fi
+
+if [ -n "$hits" ]; then
+    say ""
+    say "======================================================"
+    say " pre-commit 阻断：暂存区里有疑似密钥文件"
+    say "======================================================"
+    printf '%s' "$hits"
+    say ""
+    say "处理：确认是模板就改名为 *.example；是真密钥则从暂存区撤下："
+    say "      git restore --staged <文件>"
+    say "======================================================"
+    FAILED=1
+fi
+
+# --------------------------------------------------------------------------
+# 结果
+# --------------------------------------------------------------------------
+if [ "$FAILED" -ne 0 ]; then
+    say ""
+    say "[pre-commit] 提交已中止。确需跳过时用：git commit --no-verify"
+    exit 1
+fi
+
+exit 0

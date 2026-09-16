@@ -1,0 +1,24 @@
+# agents/claude/config.yaml
+# Claude 适配器的私有配置。
+#
+# 公共默认值见 ../_shared/agent-defaults.yaml，此处只写差异项。
+# 登记项：registry/agents.yaml 的 claude 条目（唯一登记处）。
+# 契约：根 AGENTS.md §10。
+
+id: claude
+enabled: true
+
+entry:
+  # Claude 的原生入口文件名
+  file: CLAUDE.md
+
+skills:
+  mode: symlink
+  link: skills                  # -> ../../shared/skills
+
+paths:
+  mappings: mappings.yaml       # ✅ 存在
+  projects: projects/           # ⬜ 尚未创建，产出物落盘位置
+
+notes:
+  - 规则与提示词的映射由 mappings.yaml 声明，不在本文件重复。

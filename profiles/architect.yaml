@@ -1,0 +1,45 @@
+name: architect
+
+# 只允许引用「实际存在且非空」的目标（AGENTS.md §4）。
+# 生效中：1 条 L1 规则 ≈ 9.1 KB（L1 预算 ≤48 KB）+ 2 个技能。
+# 注意：架构域规则目前只有 architecture/ddd.md 一个非空文件，
+#       因此本档 L1 极轻 —— 填好其余架构规则后应补回引用。
+
+skills:
+  - create-plan
+  - spring-boot-ddd
+
+rules:
+  # L0 常驻（AGENTS.md §2，不计入 L1 预算）
+  - common/general.md
+
+  # L1 场景规则
+  - architecture/ddd.md
+
+# =============================================================================
+# 待实现 —— 以下目标当前是空文件或不存在的目录，引用它们违反 AGENTS.md §7.5。
+# 括号内是实际状态；填写完成后再取消注释放回上方。
+# =============================================================================
+#
+# skills:
+#   - architecture-review   shared/skills/engineering/architecture-review/SKILL.md  占位
+#   - database-design       shared/skills/engineering/database-design/SKILL.md      占位
+#   - api-design            shared/skills/engineering/api-design/                   无 SKILL.md
+#   - system-design         目录不存在
+#   - microservice-design   目录不存在
+#   - ddd                   目录不存在（DDD 领域规则见 rules/architecture/ddd.md）
+#   - security-review       目录不存在
+#   - performance-analysis  目录不存在
+#
+# rules:
+#   - architecture/general.md       0 B
+#   - architecture/hexagonal.md     0 B
+#   - architecture/microservices.md 0 B
+#   - architecture/modular-monolith.md 0 B
+#   - architecture/clean-architecture.md 0 B
+#   - architecture/dependency-rules.md   0 B
+#   - api/rest.md                   0 B
+#   - api/idempotency.md            0 B
+#   - database/schema-design.md     0 B
+#   - security/general.md           0 B
+#   - ai/agent-behavior.md          0 B

@@ -1,0 +1,110 @@
+# ==================================================
+# AIHub 换行符策略
+# ==================================================
+#
+# 原则：仓库内（index / blob）与工作区都统一使用 LF。
+#
+# 这样做的理由
+#   1. AIHub 要跨 Windows / macOS / Linux 使用，LF 是唯一三方一致的表示。
+#   2. 只有 LF 才能让 diff、grep、行数统计、规则文件体积预算（AGENTS.md §2）
+#      在不同平台上给出相同结果 —— CRLF 会让每份规则凭空多出「行数」字节。
+#   3. 只要工作区里混入 CRLF，git 每次 add 都会逐文件告警
+#      「CRLF will be replaced by LF the next time Git touches it」，
+#      把真正的信息淹没掉。
+#
+# 与 core.autocrlf 的关系
+#   本文件优先级高于 core.autocrlf。为避免全局 core.autocrlf=true 与这里冲突，
+#   仓库已设置 core.autocrlf=false（见 README「换行符」一节）。
+#   排查/修复命令：python3 scripts/fix-eol.py --write
+
+# 默认：git 自动识别文本文件，仓库与工作区都用 LF
+* text=auto eol=lf
+
+# --------------------------------------------------
+# 二进制：绝不能做换行符转换
+# --------------------------------------------------
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.webp  binary
+*.svgz  binary
+*.pdf   binary
+*.zip   binary
+*.gz    binary
+*.7z    binary
+*.tar   binary
+*.jar   binary
+*.exe   binary
+*.dll   binary
+*.so    binary
+*.dylib binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+
+# --------------------------------------------------
+# Windows 原生脚本：保留 CRLF
+# --------------------------------------------------
+# 技术原因：cmd.exe 解析 .bat/.cmd 时对 LF 结尾的 goto / 标签 / 续行不可靠。
+# .ps1/.psm1/.psd1 本身能读 LF，但 Windows 侧工具链（ISE、记事本、部分 CI）
+# 仍默认 CRLF，保持一致可避免「明明没改却被显示为全文变更」。
+# 若将来要统一成 LF，删掉这四行并跑一次 fix-eol.py --write 即可。
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.ps1  text eol=crlf
+*.psm1 text eol=crlf
+*.psd1 text eol=crlf
+
+# --------------------------------------------------
+# 显式声明文本类型
+# --------------------------------------------------
+# 无扩展名或容易被 text=auto 误判的文件，逐个点名锁定。
+# 注意 .gitattributes / .gitignore 在 *.md 之类的通配之外，必须单独列出。
+.gitattributes  text eol=lf
+.gitignore      text eol=lf
+.gitkeep        text eol=lf
+.editorconfig   text eol=lf
+LICENSE         text eol=lf
+VERSION         text eol=lf
+.githooks/*     text eol=lf
+
+*.md    text eol=lf
+*.markdown text eol=lf
+*.yaml  text eol=lf
+*.yml   text eol=lf
+*.json  text eol=lf
+*.jsonc text eol=lf
+*.toml  text eol=lf
+*.ini   text eol=lf
+*.cfg   text eol=lf
+*.py    text eol=lf
+*.sh    text eol=lf
+*.bash  text eol=lf
+*.zsh   text eol=lf
+*.sql   text eol=lf
+*.xml   text eol=lf
+*.java  text eol=lf
+*.kt    text eol=lf
+*.ts    text eol=lf
+*.tsx   text eol=lf
+*.js    text eol=lf
+*.jsx   text eol=lf
+*.vue   text eol=lf
+*.css   text eol=lf
+*.scss  text eol=lf
+*.html  text eol=lf
+*.txt   text eol=lf
+*.csv   text eol=lf
+
+# --------------------------------------------------
+# 运行时生成物：不参与换行符规整
+# --------------------------------------------------
+# agents/<name>/skills 是指向 shared/skills 的目录联接，由 install.py 建立。
+# 它们被 .gitignore 排除，这里再声明一次以免被 text=auto 误判。
+agents/*/skills/**  -text
+
+# 依赖锁文件：即使内容变化也应有可读 diff，保持 LF 文本处理
+*.lock  text eol=lf

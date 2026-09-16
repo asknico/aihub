@@ -1,0 +1,82 @@
+# ==========================================================================
+# security-scan —— 密钥与仓库卫生
+# ==========================================================================
+# 与 .githooks/pre-commit 的分工（不是重复，是不同层面）：
+#   · 钩子      本地、快、只看暂存区的**文件名**，可被 --no-verify 绕过
+#   · 本工作流  服务端、看**内容**与**全部历史**、无法绕过
+#
+# 覆盖
+#   1. gitleaks 全历史密钥扫描
+#   2. 仓库守卫：密钥文件与运行时生成物不得进入版本库
+#
+# 关于 gitleaks 授权：个人仓库免费；组织账号需要在仓库 Secrets 里配置
+# GITLEAKS_LICENSE，否则该步骤会失败。
+# ==========================================================================
+
+name: security-scan
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  # 定期重扫：gitleaks 的规则集会更新，历史上当时不算问题的串
+  # 之后可能被识别为密钥。只在 push 时扫会漏掉这种情况。
+  schedule:
+    - cron: "0 2 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-scan-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  secret-scan:
+    name: 密钥扫描（全历史）
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出（需完整历史）
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  repo-guard:
+    name: 仓库守卫
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出
+        uses: actions/checkout@v4
+
+      # 判定权交给 git 自己的忽略引擎，不在这里重抄文件清单。
+      #
+      # `-i --exclude-standard` 列出「已在索引里、却命中 .gitignore」的文件，
+      # 一句话覆盖三类事故：
+      #   · 密钥文件      .env / *.pem / 根目录的 credentials.*
+      #   · 运行时联接    agents/<id>/skills（install.py 装配出来的，见 .gitignore）
+      #   · 生成物        runtime/ 下被误提交的缓存与日志
+      #
+      # 为什么不用 `... | grep ...`：本机实测某些环境下子进程 PATH 上没有 grep，
+      # 而 `|| true` 会把检查静默变成「通过」——fail-open 比不检查更危险。
+      # 下面这条命令不依赖任何外部命令。
+      #
+      # 注意：负向规则（!xxx）命中的文件不会被列出；而「先提交、后加规则」
+      # 的历史文件会被列出 —— 后者正是要抓的情况。
+      - name: 已跟踪文件不得命中 .gitignore
+        shell: bash
+        run: |
+          set -u
+          offenders=$(git ls-files --cached -i --exclude-standard)
+          if [ -n "$offenders" ]; then
+            echo "::error::以下已跟踪文件命中了 .gitignore，不应入库："
+            echo "$offenders"
+            echo "处理：git rm --cached <文件>；确属误伤则修正 .gitignore 的规则"
+            exit 1
+          fi
+          echo "仓库守卫通过：没有已跟踪文件命中 .gitignore"

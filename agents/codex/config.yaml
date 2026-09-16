@@ -1,0 +1,26 @@
+# agents/codex/config.yaml
+# Codex 适配器的私有配置。
+#
+# 公共默认值见 ../_shared/agent-defaults.yaml，此处只写差异项。
+# 登记项：registry/agents.yaml 的 codex 条目（唯一登记处）。
+# 契约：根 AGENTS.md §10。
+
+id: codex
+enabled: true
+
+entry:
+  # Codex 的原生入口文件名
+  file: AGENTS.md
+
+skills:
+  mode: symlink
+  link: skills                  # -> ../../shared/skills
+
+paths:
+  mappings: mappings.yaml       # ✅ 存在
+  projects: projects/           # ⬜ 尚未创建，产出物落盘位置
+
+notes:
+  - 规则与提示词的映射由 mappings.yaml 声明，不在本文件重复。
+  - 入口文件名与仓库根的 AGENTS.md 同名，但作用域不同：
+    根文件是 Hub 级契约，本文件只是本目录的入口指引。

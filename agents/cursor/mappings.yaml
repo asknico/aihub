@@ -1,0 +1,20 @@
+# agents/cursor/mappings.yaml
+# 本 Agent 的路径映射：把 Hub 的权威资产映射到 Cursor 的原生查找路径。
+#
+# 契约：根 AGENTS.md §10 —— 只做映射声明，禁止复制内容。
+# target 为本机路径，启用同步前按实际安装位置核对。
+
+rules:
+  source: ../../shared/rules
+  target: .cursor/rules
+  # Cursor 读取 .mdc 格式；md -> mdc 的转换器尚未实现（scripts/ 下无对应工具）。
+  # 转换器落地前，本项只能人工同步。
+  format: mdc
+
+skills:
+  source: ../../shared/skills
+  target: ~/.cursor/skills
+
+prompts:
+  source: ../../shared/prompts   # ⬜ shared/prompts/ 目前为空
+  target: ~/.cursor/prompts

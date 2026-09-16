@@ -1,0 +1,92 @@
+AIHub
+├── agents
+│   ├── claud
+│   │   ├── CLAUDE.md
+│   │   └── config.yaml
+│   ├── codex
+│   │   ├── CODEX.md
+│   │   └── config.yaml
+│   ├── cursor
+│   └── deepseek
+├── config
+│   ├── global.yaml
+│   ├── mcp.yaml
+│   ├── models.yaml
+│   └── permissions.yaml
+├── env
+├── mcp
+│   ├── profiles
+│   ├── mcp.json
+│   └── servers.yaml
+├── profiles
+│   ├── architect.yaml
+│   ├── fullstack.yaml
+│   ├── java-developer.yaml
+│   ├── product-manager.yaml
+│   └── tester.yaml
+├── registry
+│   └── skills.yaml
+├── scripts
+│   ├── check.psl
+│   ├── install.psl
+│   ├── sync.psl
+│   └── update.psl
+├── shared
+│   ├── knowledge
+│   ├── memory
+│   ├── prompts
+│   │   ├── architecture
+│   │   ├── coding
+│   │   ├── product
+│   │   ├── system
+│   │   └── testing
+│   ├── rules
+│   │   ├── architecture
+│   │   ├── coding
+│   │   ├── git
+│   │   └── security
+│   └── skills
+│       ├── common
+│       │   ├── documentation
+│       │   ├── task-planning
+│       │   └── web-research
+│       ├── devops
+│       │   ├── docker
+│       │   ├── github-actions
+│       │   └── kubernetes
+│       ├── engineering
+│       │   ├── architecture-review
+│       │   │   └── SKILL.md
+│       │   ├── database-design
+│       │   │   └── SKILL.md
+│       │   ├── java-code-review
+│       │   │   ├── examples
+│       │   │   │   ├── bad-review.md
+│       │   │   │   └── good-review.md
+│       │   │   ├── references
+│       │   │   │   ├── java-style.md
+│       │   │   │   ├── security-checklist.md
+│       │   │   │   └── spring-guidelines.md
+│       │   │   ├── scripts
+│       │   │   │   └── check.psl
+│       │   │   ├── templates
+│       │   │   ├── tests
+│       │   │   │   └── cases.yaml
+│       │   │   └── SKILL.md
+│       │   └── spring-boot
+│       │       └── SKILL.md
+│       ├── product
+│       │   ├── prd-review
+│       │   └── requirement-analysis
+│       ├── qtp-ddd
+│       └── testing
+│           ├── api-testing
+│           ├── test-case-design
+│           └── unit-testing
+├── templates
+│   ├── java
+│   ├── microservice
+│   └── spring-boot
+├── AGENTS.md
+├── AIHUB_STRUCTURE.md
+└── README.md

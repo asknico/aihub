@@ -1,0 +1,16 @@
+defaults:
+  filesystem:
+    read: true
+    write: false
+
+  shell:
+    enabled: false
+
+  network:
+    enabled: false
+
+  git:
+    push: false
+
+  secrets:
+    access: false

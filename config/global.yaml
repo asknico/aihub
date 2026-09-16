@@ -1,0 +1,42 @@
+# config/global.yaml
+# AIHub 全局设置（Hub 级默认值）。
+# 契约：根 AGENTS.md §2（单一事实源）、§6（加载预算）、§13（变更安全）。
+#
+# 本文件只放「没有其他权威来源」的设置。
+# 路径派生值不在此登记 —— AIHUB_SKILLS 等由 scripts/lib/env.py 从 AIHUB_HOME 计算，
+# 登记它等于制造第二份事实源。
+
+hub:
+  # 版本号唯一来源
+  version_source: VERSION
+
+  # 未指定 profile 时的默认角色档；可被调用方覆盖
+  # 可选值 = profiles/ 下的文件名（不含扩展名）
+  default_profile: java-developer
+
+rules:
+  # L0 常驻规则：每次会话注入（根 AGENTS.md §6）
+  bootstrap: common/general.md
+
+  # L1 只加载 profile 圈定的规则；禁止预加载整库
+  preload_all: false
+
+runtime:
+  # 仓库内运行时目录：临时文件、缓存、日志的唯一落点（根 AGENTS.md §5 红线）
+  root: runtime/
+
+  # 仓库外私有数据目录由环境变量提供，本文件不登记其字面路径
+  data_root_env: AIHUB_DATA
+
+files:
+  # 文本文件统一 LF；例外（.bat/.cmd/.ps1 保留 CRLF）以 .gitattributes 为准
+  eol: lf
+  charset: utf-8
+
+git:
+  # 一次提交只做一件事（根 AGENTS.md §13）
+  single_intent_commits: true
+
+  # 钩子目录。core.hooksPath 存在 .git/config，不随克隆分发，
+  # 换机器后必须重设：git config core.hooksPath .githooks（根 AGENTS.md §16）
+  hooks_path: .githooks

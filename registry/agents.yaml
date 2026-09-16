@@ -1,0 +1,16 @@
+# registry/agents.yaml
+agents:
+  claude:
+    enabled: true
+    path: agents/claude
+    skillMode: symlink
+  codex:
+    enabled: true
+    path: agents/codex
+    skillMode: symlink
+  cursor:
+    enabled: true
+    path: agents/cursor
+  deepseek:
+    enabled: true
+    path: agents/deepseek    
