@@ -6,14 +6,14 @@
 > 本文件中「必须 / 禁止 / 可以 / 应当」遵循 RFC 2119 语义。
 >
 > **状态图例**
-> ✅ 已落地 —— 路径存在且可用
-> ⬜ 规划中 —— 路径不存在或为空，**禁止当作已生效引用**
+> ✅ 已实现 —— 已有实质内容；可用范围仍须按实际实现核对
+> ⬜ 待实现 —— 路径缺失、空白或仅占位，**禁止当作已生效引用**
 >
-> 完整清单见 §20。引用任何目标前先核对该节。
+> 现状快照见 §20。引用前必须检查实际文件；快照、README 和旧注释不能代替检查。
 
 ---
 
-## 0. 使命（Mission）
+## 0. 使命
 
 AIHub 是**可共享、可版本化管理的 AI Agent 配置资产**的唯一权威来源。
 
@@ -44,7 +44,7 @@ AIHub **不**拥有：
 
 ---
 
-## 1. 仓库边界（Repository Boundaries）
+## 1. 仓库边界
 
 ### AIHub
 
@@ -58,38 +58,38 @@ AIHub/                    # 以下均为实际存在的顶层目录
 ├── agents/               # ✅ 各 Agent 适配器
 ├── config/               # ✅ Hub 级配置
 ├── docs/                 # ✅ 文档
-├── mcp/                  # ✅ MCP 定义
+├── mcp/                  # ⬜ MCP 定义与示例均为占位
 ├── profiles/             # ✅ 角色档
-├── registry/             # ✅ 注册表（生成物）
+├── registry/             # ⬜ 注册表（过渡期清单；目标为生成物（§11））
 ├── runtime/              # ✅ 本机运行时（不入库）
 ├── scripts/              # ✅ 工具脚本
 ├── shared/               # ✅ 共享事实源
-└── templates/            # ⬜ 目录为空，脚手架模板尚未落地
+└── templates/            # ⬜ 仅目录骨架，脚手架模板尚未落地
 ```
 
 ### AIHUB_DATA
 
-`AIHUB_DATA` 指向**仓库之外**的本地私有数据。它与 `AIHUB_HOME` 是两条独立路径，无法互相推导，因此必须由环境变量单独定义。
+`AIHUB_DATA` 指向**仓库之外**的本地私有数据，须独立配置。它与 `AIHUB_HOME` 是两条独立路径，无法互相推导，因此必须由dotenv环境变量（§7）单独定义。
 
 ```text
 ${AIHUB_DATA}/
-├── local/          # ⬜ 本地覆盖
-├── secrets/        # ⬜ 密钥
-├── memory/         # ⬜ 本机记忆
-├── sessions/       # ⬜ 会话
-├── state/          # ⬜ 运行时状态
-├── cache/          # ⬜ 缓存
-├── logs/           # ⬜ 日志
-└── tmp/            # ⬜ 临时文件
+├── local/          # 本地覆盖
+├── secrets/        # 密钥
+├── memory/         # 本机记忆
+├── sessions/       # 会话
+├── state/          # 运行时状态
+├── cache/          # 缓存
+├── logs/           # 日志
+└── tmp/            # 临时文件
 ```
 
 `AIHUB_DATA` **禁止**提交到 Git。
 
-⚠️ **已知不一致**：`.env` 中 `AIHUB_DATA` 的字面值与磁盘上的实际目录名对不上，见 §20「已知不一致」。
+使用前检查外部绝对路径与权限，禁止根据示例路径移动私人数据。
 
 ---
 
-## 2. 单一事实源规则（Source-of-Truth Rules）
+## 2. 单一事实源规则
 
 每个概念有且只有一个权威来源。
 
@@ -102,14 +102,14 @@ ${AIHUB_DATA}/
 | 提示词 | `shared/prompts/**` | ⬜ 空 |
 | 角色档 | `profiles/**` | ✅ |
 | Agent 适配器 | `agents/<agent-id>/**` | ✅ |
-| MCP 定义 | `mcp/**` | ✅ |
+| MCP 定义 | `mcp/**` | ⬜ 占位 |
 | 模板 | `templates/**` | ⬜ 空 |
-| 注册表 | `registry/**` | ✅ |
+| 注册表 | `registry/**` | ⬜ 过渡期输入 / 目标生成视图，见 §11 |
 | 团队级结论 | `shared/memory/**` | ⬜ 空（入库） |
-| 本地覆盖 | `${AIHUB_DATA}/local/**` | ⬜ |
-| 密钥 | `${AIHUB_DATA}/secrets/**` | ⬜ |
-| 本机记忆 | `${AIHUB_DATA}/memory/**` | ⬜ |
-| 运行时状态 | `${AIHUB_DATA}/state/**` | ⬜ |
+| 本地覆盖 | `${AIHUB_DATA}/local/**` | 本机核对 |
+| 密钥 | `${AIHUB_DATA}/secrets/**` | 本机核对 |
+| 本机记忆 | `${AIHUB_DATA}/memory/**` | 本机核对 |
+| 运行时状态 | `${AIHUB_DATA}/state/**` | 本机核对 |
 
 **禁止**在多个位置手工维护同一份信息。优先用引用，而不是复制。
 
@@ -120,7 +120,7 @@ ${AIHUB_DATA}/
 
 ---
 
-## 3. Hub 与项目的职责划分（Hub vs Project Responsibility）
+## 3. Hub 与项目的职责划分
 
 AIHub 定义：**Agent 应当如何工作。**
 业务仓库定义：**项目是什么、适用哪些项目级约束。**
@@ -138,7 +138,7 @@ AIHub 定义：**Agent 应当如何工作。**
 - 数据库约束
 - 项目专属安全要求
 
-属于**全局**的例子：
+属于**全局级**的例子：
 
 - Java 约定
 - Spring Boot 约定
@@ -150,7 +150,7 @@ AIHub 定义：**Agent 应当如何工作。**
 
 ---
 
-## 4. 资产分类（Asset Classification）
+## 4. 资产分类
 
 创建文件之前，先分类。
 
@@ -176,20 +176,20 @@ AIHub 定义：**Agent 应当如何工作。**
 
 - 能从代码里读出来的事实（表结构、接口签名）→ 不进 knowledge
 - 待办与进度 → 不进 knowledge，进 memory
-- 密钥 → 不进以上任何位置
+- 密钥 → 只进入 §12 指定的私有机制，禁止写入共享资产
 
 如果内容不适合任何一类，先弄清归属再创建。
 
 ---
 
-## 5. 强制操作规则（Mandatory Operating Rules）
+## 5. 强制操作规则
 
 ### 改动前
 
-1. **先读后动**：先读本文件，再读 `shared/rules/common/general.md`（L0），然后按 `read-when` 命中本次任务的相关规则。
-2. **确定场景**：确定任务类别与适用的 Profile。
+1. **先读后动**：先读本文件，再读 `shared/rules/common/general.md`（L0）；先检查 Git 状态，保留用户已有改动。再按 `read-when` 加载相关规则；旧文件缺少元数据时，按路径、标题和任务匹配，不编造触发条件。
+2. **确定场景**：确定任务类别与适用的 Profile。Hub 文档、目录和装配维护没有专用 Profile 时，使用 L0 加相关任务规则，不因默认角色是 Java 开发者而加载无关业务规则。
 3. **按需加载**：只加载与任务相关的规则和技能，禁止预加载整库（§6）。
-4. **先检索后创建**：创建新文件前先查看既有文件，检索是否已有等价规则或技能；发现内容重复，先合并再继续。
+4. **先检索后创建**：创建新文件前先查看既有文件，检索是否已有等价规则或技能；发现重复时优先复用；合并超出本次范围则报告，不自行扩大改动。
 
 ### 改动中
 
@@ -201,48 +201,44 @@ AIHub 定义：**Agent 应当如何工作。**
 ### 完成后
 
 9. **先验证后报告**：结果未经验证不得宣称完成；校验工具缺失或不完整时，必须如实说明该局限（§15）。
-10. **留下记录**：每次实质性工作追加一行到 `shared/memory/YYYY-MM-DD.md`（只追加，不回写历史）。
+10. **留下记录**：实质性工作中可共享的结论追加到 `shared/memory/YYYY-MM-DD.md`（只追加，不回写历史）；个人进度与会话细节留在数据面。用户限定文件范围或只读分析时，不额外创建记录文件，在回复中说明。
 
 ### 红线（任何时候）
 
-- **密钥隔离**：真实密钥只放仓库根目录 `.env`（不入版本库）；`.env.example` 只允许出现键名与占位符。
-- **运行时隔离**：临时文件、缓存、日志只写 `runtime/`；除此之外禁止在仓库内产生任何生成物。
+- **密钥隔离**：统一执行 §12；`.env.example` 只允许出现键名与安全占位符。
+- **运行时隔离**：仓库内的临时文件、缓存、日志只写 `runtime/`；外部私有数据写 `${AIHUB_DATA}`。§14 声明的生成资产例外；禁止把临时验证产物混入源目录。运行 Python 校验使用 `-B` 避免产生 `__pycache__`。
 - **不确定就问**：一次确认的成本远低于一次错误变更；禁止基于猜测修改共享层。
 
 当所需信息缺失或互相矛盾时，停止受影响的变更，并报告该歧义。
 
 ---
 
-## 6. 规则加载模型与预算（Rule Loading Model）
+## 6. 规则加载模型与预算
 
 规则采用渐进披露（Progressive Disclosure），**加载总量必须受控**。
 
 | 层 | 内容 | 加载方式 | 预算 | 落地 |
 |---|---|---|---|---|
-| 入口 | 本文件 | 每次会话全文注入 | ≤700 行 / 20KB | ✅ |
+| 入口 | 本文件 | 每次会话读取 | 见 §8 | ✅ |
 | L0 常驻 | `shared/rules/common/general.md` 核心原则 | 每次会话注入 | ≤10KB | ✅ |
-| L1 场景 | `profiles/<角色>.yaml` 圈定的 5-8 条规则 | 会话开始注入 | ≤48KB | ✅ |
+| L1 场景 | `profiles/<角色>.yaml` 实际启用的规则 | 会话开始注入 | ≤48KB | ✅ |
 | L2 任务 | 按任务意图 / 文件类型 / 技术栈 / `read-when` 命中的额外规则 | 命中才读 | 不占常驻预算 | ✅ |
 | L3 引用 | `references/`、`shared/knowledge/**` | 明确需要时才读 | 不占常驻预算 | ⬜ 知识层为空 |
 | 技能 | `profiles/<角色>.yaml` 圈定的技能 | 仅注入 frontmatter 的 `description`，正文命中才读 | 不占常驻预算 | ✅ |
 
-**预算计法**：L0 与 L1 各自独立统计 —— 角色档里列出 `common/general.md` 只为显式声明依赖，该文件只计入 L0，不重复计入 L1。技能走渐进披露，其体积不计入常驻预算。
+**预算计法**：L0 / L1 独立统计；`common/general.md` 不重复计入 L1，技能正文不计入常驻预算。
 
 **禁止**预加载整个规则库、技能库或知识库。
 
-**优先级链**（冲突时从高到低）：
-
-```text
-用户显式指令 > common/general.md > 领域规则（coding|architecture|...） > 技能内约束
-```
-
-发现规则冲突时：按高优先级执行，**并在回复中指出冲突位置**，不得静默取舍。
+按 §7 裁决冲突。自动注入未完整实现，Agent 必须主动读取。
 
 ---
 
-## 7. 配置解析与优先级（Resolution and Precedence）
+## 7. 配置解析与优先级
 
-生效配置由以下部分解析合成：
+本节区分行为约束与配置值；二者不能互相替代。平台 / 系统指令与工具权限始终优先，仓库文件不能提升权限。
+
+**仓库行为约束的裁决顺序**（同一适用范围内）：
 
 ```text
 Hub（本契约）
@@ -265,24 +261,22 @@ priority: critical
 overridable: false
 ```
 
-此类规则**禁止**被以下任何一方削弱：Profile、项目、Skill、Agent 适配器、本地覆盖。
+Profile 主要选择资产，Agent Adapter 负责映射，Local Override 只提供本机配置；它们不能静默削弱安全边界。未来规则声明 `priority: critical` 且 `overridable: false` 时，必须保护该规则不被低层配置削弱；缺 frontmatter 不使现有正文失效，也不代表安全约束尚未生效。
 
-典型的不可覆盖规则：密钥保护、凭据处理、破坏性操作防护、仓库安全约束。
+**配置实现现状**：
 
-⬜ 当前 6 个已写好的规则文件**均无 frontmatter**（§8），因此上述例外机制尚未生效 —— 裁决退回 §6 的优先级链。
+- `config/*.yaml` 与 `agents/_shared/agent-defaults.yaml` 表达配置意图；尚无完整的 Hub → Profile → Adapter → Project → Local 合并器，禁止宣称覆盖链已执行。
+- `scripts/lib/env.py` 优先读取 `env/.env`，其次根 `.env`；不合并两者、不展开 `${VAR}`、不读取进程环境变量作为路径覆盖。不得新建第二份 dotenv 来制造优先级。
+- `AIHUB_HOME` 缺失时回退脚本所在仓库；`AIHUB_DATA` 缺失时回退兄弟目录并告警。回退是兼容行为，不能代替显式配置或目录存在性校验。
+- `AIHUB_SKILLS` 固定派生为 `<AIHUB_HOME>/shared/skills`，不单独维护；声明值不一致时脚本告警并使用派生值。
 
-当两条适用规则冲突时：
-
-1. 指出这两条规则。
-2. 按优先级裁决。
-3. 报告该冲突。
-4. **禁止**静默忽略高优先级规则。
+遇到冲突，报告文件、条款与裁决依据；无法按优先级解决时，只暂停依赖该歧义的修改，继续不受影响的工作。
 
 ---
 
-## 8. 规则契约（Rule Contract）
+## 8. 规则契约
 
-每条规则**必须**包含 frontmatter：
+新增规则、或本次实质性修改的规则**必须**包含非空 frontmatter；未触及的旧规则缺口记录在 §20，不为补齐元数据而扩大任务：
 
 ```yaml
 id:
@@ -295,9 +289,10 @@ read-when:
 updated:
 ```
 
-推荐补充字段：`version:` `tags:` `overridable:` `applies-to:`
+`id` 必须全库唯一，`updated` 使用 `YYYY-MM-DD`，`read-when` 必须描述可判断的触发条件。
+推荐补充字段：`version:` `tags:` `overridable:` `applies-to:`。字段枚举的机器校验尚未实现，不得声称已通过 schema 校验。
 
-**体量上限**（按实测校准，超出部分拆到同级 `references/`）：
+**体量上限**（KB 按 1024 字节、UTF-8 文件字节数计；行数和字节数均须满足，超出部分拆到同级 `references/`）：
 
 | 对象 | 上限 |
 |---|---|
@@ -305,15 +300,13 @@ updated:
 | 技能 `SKILL.md` | ≤300 行 |
 | 本文件（`AGENTS.md`） | ≤700 行 / 24KB |
 
-规则**必须**：描述可执行的约束；避免主观措辞；只包含一个内聚的关注点；不与其他规则重复；用引用关联相关规则，而不是复制。
+规则必须可执行、内聚、无重复；关联规则使用引用。
 
-优先使用小而可组合的规则，而不是大而全的规则文件。
-
-⬜ 当前 `shared/rules/` 共 70 个文件，仅 6 个已写好，且**都还没有 frontmatter** —— 见 §20。
+旧规则的元数据缺口见 §20。
 
 ---
 
-## 9. 技能契约（Skill Contract）
+## 9. 技能契约
 
 Skill 表示一个可复用的工作流，不是常驻规则。
 
@@ -330,7 +323,7 @@ skill-name/
     └── cases.yaml
 ```
 
-只创建该技能真正会用到的目录。
+只建所需目录。
 
 `SKILL.md` **必须**描述：何时适用该技能；所需输入；执行流程；预期输出；验证标准；必需的 references；相关时的权限或工具。
 
@@ -340,13 +333,13 @@ skill-name/
 
 ---
 
-## 10. Agent 适配器契约（Agent Adapter Contract）
+## 10. Agent 适配器契约
 
 `agents/<agent-id>/` 的存在只有一个目的：把 AIHub 的权威资产适配到某个 Agent 的原生配置模型。
 
 Agent 目录**禁止**变成以下内容的独立来源：共享规则、共享技能、共享知识、密钥、运行时状态。
 
-**已登记 Agent**（唯一登记处：`registry/agents.yaml`）：
+**已登记 Agent**（当前登记输入：`registry/agents.yaml`，见 §11）：
 
 | id | 路径 | `skillMode` |
 |---|---|---|
@@ -355,7 +348,7 @@ Agent 目录**禁止**变成以下内容的独立来源：共享规则、共享�
 | `cursor` | `agents/cursor/` | 未声明 |
 | `deepseek` | `agents/deepseek/` | 未声明 |
 
-标识全仓统一用上表四个 key；新增 Agent 必须先登记再建目录。
+标识全仓使用上述 key。新增 Agent 必须在同一任务中明确登记来源与生成流程；生成器未实现期间遵循 §11，不手工补写生成清单来绕过缺口。
 
 一个 Agent 适配器**可以**包含：
 
@@ -365,20 +358,26 @@ agents/<id>/
 ├── config.yaml             # 私有配置：只写与 agent-defaults 的差异项
 ├── mappings.yaml           # 路径映射：源 → 目标，不做内容复制
 ├── skills/                 # 指向 shared/skills 的目录联接（生成物）
-└── projects/               # ⬜ 产出物落盘位置
+└── projects/               # 若使用，只存可共享的项目映射；不放业务源码
 ```
 
 公共默认值集中在 `agents/_shared/agent-defaults.yaml`，各 Agent 只写差异项。
 
 **优先使用链接、渲染或引用权威资产，而不是复制。**
 
-`skills/` 联接由 `scripts/install.py` 装配，是**生成物**：禁止在其中新增、修改或删除文件 —— 改动会同时影响其他 Agent，也绕过 §13 的变更流程。联接不入版本库（见 `.gitignore`），换机器后重跑安装脚本即可。
+`skills/` 联接由 `scripts/install.py` 装配，是**生成物**：禁止在其中新增、修改或删除文件 —— 改动会同时影响其他 Agent，也绕过 §13 的变更流程。联接不入版本库（见 `.gitignore`），换机器后重跑安装脚本并校验联接目标。
+
+安装器只装配仓库内的技能联接，不部署 `mappings.yaml` 中的用户目录目标。映射声明不等于原生工具已支持或已加载；部署前须验证目标、格式与实际效果。扫描和统计共享技能只遍历 `shared/skills/`，禁止沿联接重复统计；删除前必须区分联接与真实目录。
 
 ---
 
-## 11. 注册表契约（Registry Contract）
+## 11. 注册表契约
 
-`registry/**` 是生成态（generated state）。**禁止**手工编辑 registry 文件。
+`registry/**` 的目标是生成态（generated state），**禁止**手工编辑。当前必须区分：
+
+- `registry/agents.yaml` 是安装器实际读取的历史登记输入；它尚不能从适配器元数据重建，不能声称已有独立权威源。
+- 其余清单为空或为历史手工索引，不能用来证明资产存在、启用或完整。
+- 涉及登记项的新增、删除、改名时，先在任务范围内落地权威元数据和生成器；不具备条件则报告阻塞。无关的文档维护无需重新生成。
 
 权威元数据与其所属的源资产放在一起。
 
@@ -402,20 +401,9 @@ Registry 生成流程：
 
 ---
 
-## 12. 安全边界（Security Boundary）
+## 12. 安全边界
 
-**禁止**提交：
-
-- API Key
-- 访问令牌（Access Token）
-- 刷新令牌（Refresh Token）
-- 密码
-- Cookie
-- 会话数据
-- 私钥（Private Key）
-- 凭据
-- 生产环境密钥
-- 敏感内网端点
+**禁止**提交：密钥、密码、令牌、Cookie、会话、私钥、凭据及敏感内网端点。
 
 配置文件**必须间接**引用密钥。推荐写法：
 
@@ -431,40 +419,33 @@ api_key: 真实密钥值
 
 `.env.example` 只定义变量名和安全占位符（它是唯一键名清单，新增变量必须同步登记）。真实密钥存放于配置好的外部密钥机制或 `${AIHUB_DATA}/secrets/`。
 
+仓库根 `.env` 是现有工具允许的本机配置入口，必须保持未跟踪；禁止将其完整内容输出到对话、日志或 diff。检查环境时只读取必要键名、路径及存在性，不打印密钥值。`.gitignore` 不能保护已经跟踪的文件，提交前必须单独检查。
+
 **私有 Git 仓库不是密钥保险箱。**
 
 ---
 
-## 13. 变更安全（Change Safety）
+## 13. 变更安全
 
 每一次变更必须：范围明确（scoped）；可评审（reviewable）；可复现（reproducible）；可回滚（reversible）。
 
-**禁止**把以下不相关内容混在一起：重构、格式化、配置变更、行为变更、生成文件变更。
+**禁止**混入无关的重构、格式化或配置变更。同一意图必需的源修改、依赖引用与生成结果应当原子化交付，不能以“生成文件变更必须分开”为由留下不一致状态。
 
-重命名、移动或删除共享资产之前：
-
-1. 检索所有引用。
-2. 找出受影响的 Profile。
-3. 找出受影响的 Agent 适配器。
-4. 找出受影响的 registry。
-5. 找出受影响的模板。
-6. 原子化地更新所有依赖方。
-7. 重新生成生成态。
-8. 验证引用。
+重命名、移动或删除共享资产之前，检索 Profile、适配器、registry 与模板中的引用；在同一改动中更新必要依赖、重新生成受影响的生成态并验证引用。生成器缺失时按 §11 处理。
 
 ---
 
-## 14. 生成文件（Generated Files）
+## 14. 生成文件
 
 被明确标记为 generated 的文件**禁止**手工编辑，含 `registry/**`、`AIHUB_STRUCTURE.md`、`AIHUB_TREE.txt`、`agents/<id>/skills/` 联接。
 
-生成物**必须**能说明：它的来源；它的生成器；如何重新生成它。
+生成物必须说明来源、生成器与重建命令。
 
 如果生成输出与源状态意外不一致，**修复源或生成器，而不是修补生成输出**。
 
 ---
 
-## 15. 校验（Validation）
+## 15. 校验
 
 适用的校验通过之前，变更不算完成。
 
@@ -474,22 +455,28 @@ api_key: 真实密钥值
 结构 → 元数据 → 引用 → Profile → Registry → 安全 → Agent 映射
 ```
 
-工具存在时，优先使用：
+先检查工具实现与依赖；优先使用只读检查：
 
-```powershell
-scripts/install.py --check-only   # ✅ 目录骨架 / 配置键名 / 角色档 / 技能联接
-scripts/fix-eol.py                # ✅ 换行符策略体检（只读；--write 才改写）
-scripts/validate.py               # ⬜ 0 字节，未实现
-scripts/security-check.py         # ⬜ 0 字节，未实现
-scripts/sync.py                   # ⬜ 0 字节，未实现
-scripts/doctor.py                 # ⬜ 0 字节，未实现
+```python
+python -B scripts/install.py --check-only
+python -B scripts/install.py --check-only --profile java-developer
+python -B scripts/fix-eol.py
+git diff --check
 ```
 
-**禁止**在所需工具缺失、不完整或未实际执行的情况下，宣称校验已通过。必须明确报告该局限。
+- 不带 `--profile` 会跳过角色档；涉及其他角色时逐个传入实际名称，禁止将单个角色通过说成全部通过。
+- 角色档和技能联接检查需要 PyYAML；`--check-only` 不禁止依赖安装提示。只读任务不得加 `--yes` 或确认安装，缺依赖时报告未完成项。
+- 安装器对空引用、体积超限等仅告警，联接缺失 / 指向错误也可能只输出 INFO；退出码 0 不等于所有约束满足，必须审阅输出。
+- `install.py` 未验证 frontmatter 完整性、完整映射部署、数据目录存在性或 Registry 可复现性；对本次变更相关的缺口补充只读核对。
+- `fix-eol.py` 默认只报告；`--write` 会批量修改。仅改一个文件时不得为消除仓库既有告警批量格式化。
+- `scripts/{validate,security-check,sync,doctor,check,update}.py` 当前为空，空脚本退出成功不能作为验证证据。
+- 纯文档变更检查章节引用、事实依据、体量、换行及 diff；代码 / 配置变更按影响范围增加语法、引用和行为验证。
+
+报告必须区分本次通过、既有问题和未验证；工具缺失不得宣称通过，不为历史缺口扩大改动。
 
 ---
 
-## 16. Git 安全（Git Safety）
+## 16. Git 安全
 
 提交之前：确认没有密钥被暂存；确认生成的 registry 已同步；确认引用可解析；审查 diff；排除无关修改。
 
@@ -497,7 +484,9 @@ scripts/doctor.py                 # ⬜ 0 字节，未实现
 
 一次提交应当代表一个内聚的意图。
 
-**钩子**：`.githooks/pre-commit` 检查换行符策略与密钥文件名。`core.hooksPath` 存在 `.git/config` 里，**不随克隆分发** —— 换机器或重新克隆后**必须**重设：
+文本编码使用 UTF-8，换行策略以 `.gitattributes` 为唯一来源。只规范化本次修改的文件，禁止顺手全仓转换。
+
+**钩子**：`.githooks/pre-commit` 检查换行符策略与密钥文件名，不能替代密钥内容扫描。`core.hooksPath` 存在 `.git/config` 里，**不随克隆分发** —— 换机器或重新克隆后**必须**重设：
 
 ```sh
 git config core.hooksPath .githooks
@@ -505,17 +494,17 @@ git config core.hooksPath .githooks
 
 ---
 
-## 17. 项目生成（Project Generation）
+## 17. 项目生成
 
-AIHub 模板可以生成业务项目，但生成的项目**不归** AIHub 仓库所有。
+项目生成是规划能力，当前模板尚未实现；落地后生成的业务项目**不归** AIHub 仓库所有。
 
 项目默认输出位置在 `AIHUB_HOME` 之外，例如：
 
 ```text
 C:\Work\
-├── AIHub\            # 控制面
-├── AIHub_Data\       # 数据面（本地私有，不入库）
-└── Projects\         # ⬜ 生成的项目，尚未落地
+├── AIHub\                  # 控制面
+├── AIHub_Data\             # 数据面（本地私有，不入库）
+└── AIHub_Workspace\        # ⬜ 生成的项目，尚未落地
     ├── order-service\
     └── payment-service\
 ```
@@ -526,7 +515,7 @@ C:\Work\
 
 ---
 
-## 18. 完成定义（Definition of Done）
+## 18. 完成定义
 
 宣布 AIHub 任务完成之前，逐项核对：
 
@@ -544,9 +533,7 @@ C:\Work\
 
 ---
 
-## 19. 核心原则（Core Principle）
-
-判断某样东西归属哪里时，使用这个模型：
+## 19. 核心原则
 
 ```text
 Rule（规则）        = 必须遵守的约束
@@ -565,39 +552,38 @@ AIHUB_DATA          = 本地 / 私有 / 运行时数据面（Data Plane）
 
 ## 20. 现状清单（会过期，以实际扫描为准）
 
-本节记录 ⬜ 项的准确状态。最后核对：**2026-09-16**。过期后应更新或删除，不留失效描述。
+最后核对：**2026-09-17**。统计排除 `.git/`、`runtime/`、Python 缓存与技能联接；空目录不随 Git 克隆保留。
 
-### 已落地
+### 已有实质内容
 
-- 13 个顶层目录齐全（`.githooks` / `.github` / `.vscode` / `agents` / `config` / `docs` / `mcp` / `profiles` / `registry` / `runtime` / `scripts` / `shared` / `templates`）
-- `.env`（根目录）+ `.env.example`：5 个键名已登记；`AIHUB_SKILLS` 刻意不登记（派生值，由 `scripts/lib/env.py` 计算）
-- `shared/rules/` 70 个文件中 **6 个**已写好（149–199 行 / 7.3–9.8KB），**均缺 frontmatter**（§8）
-- `shared/skills/` 6 个技能目录：`create-plan`、`spring-boot-ddd` 内容完整；`java-code-review`、`spring-boot` 为精简版
-- 脚本：`install.py`、`fix-eol.py`、`lib/{config,deps,env}.py` 可用
-- `.githooks/pre-commit` 已启用；`.github/workflows/` 下 validate 与 security-scan 两个工作流
-- 6 个角色档（`profiles/*.yaml`）校验通过
+- 顶层 13 个目录存在（不计 `.git`），目录存在不等于内容或功能可用。
+- 根 `.env` 的 5 个键名均登记于 `.env.example`；`AIHUB_SKILLS` 由 `scripts/lib/env.py` 派生。
+- `shared/rules/` 共 70 个文件（含 INDEX 与 `_meta`），6 个有正文、64 个为空。6 个正文均缺 frontmatter。
+- `shared/skills/` 共 6 个 `SKILL.md`：`create-plan`、`spring-boot-ddd` 有工作流正文；`java-code-review`、`spring-boot` 为精简版；另外 2 个为 3 字节占位。不是所有技能子目录都有入口文件。
+- `profiles/` 有 6 个角色档；`product-manager` 与 `tester` 当前只引用 L0，不代表产品 / 测试能力完整。是否通过校验必须以本次执行结果为准。
+- `install.py`、`fix-eol.py`、`scripts/lib/{config,deps,env}.py` 有实现；适用范围与限制见 §7、§15。
+- Agent 公共默认值、Claude / Codex 配置及入口、四个 Agent 的映射声明均存在；声明不等于完成部署。
+- `.githooks/pre-commit` 与两个 CI 工作流存在。`validate.yaml` 目前只显式校验 `java-developer`；`security-scan.yaml` 配置 gitleaks 与跟踪文件守卫，配置存在不等于本次运行成功。
 
-### ⬜ 尚未落地
+### 待实现 / 仅骨架
 
-| 项 | 状态 |
+| 项 | 实测状态 |
 |---|---|
-| `shared/knowledge/`、`shared/prompts/`、`shared/memory/` | 目录存在，均为空 |
-| `templates/` | 目录存在，为空 |
-| `scripts/{check,doctor,security-check,sync,update,validate}.py` | 0 字节 |
-| `shared/rules/INDEX.md` | 0 字节（§5.4 要求新增规则时在此登记） |
-| `shared/rules/_meta/{README,rule-authoring,rule-schema}.md` | 3 个文件均 0 字节（frontmatter 规范未成文） |
-| `shared/skills/engineering/{architecture-review,database-design}/SKILL.md` | 3 字节占位 |
-| `registry/*.yaml` | 手工产物，与实际不符；生成器未实现（§11） |
-| `${AIHUB_DATA}` 各子目录 | 均不存在 |
-| `Projects/` 与项目生成能力 | 未落地（§17） |
+| `shared/knowledge/`、`shared/prompts/`、`templates/` | 有子目录骨架，无文件 |
+| `shared/memory/` | 空目录 |
+| `mcp/servers.yaml`、`mcp/profiles/*.yaml`、`mcp/examples/mcp.local.example.json` | 共 5 个文件，均为 0 字节 |
+| `scripts/{check,doctor,security-check,sync,update,validate}.py` | 均为 0 字节 |
+| `shared/rules/INDEX.md`、`shared/rules/_meta/*.md` | 共 4 个文件，均为 0 字节，不作生效规范引用 |
+| `shared/skills/engineering/{architecture-review,database-design}/SKILL.md` | 3 字节占位，无可执行工作流 |
+| `registry/{mcp,profiles}.yaml` | 0 字节 |
+| `registry/{agents,rules,skills}.yaml` | 历史手工清单，无可复现生成器；过渡规则见 §11 |
+| 项目模板生成、配置合并、原生目录部署 | 尚无完整实现，不得仅据目录 / YAML 声称可用 |
 
-### 已知不一致（需修）
+### 已核实的漂移与限制
 
-1. **`AIHUB_DATA` 指向不存在的位置**：`.env` 里写的是 `C:\Work\AIHub_Data`，磁盘上实际存在的是 `C:\Work\AIHub_Data`（带下划线）。二者必须统一 —— 要么改 `.env`，要么改目录名。**在统一之前，脚本读到的 `AIHUB_DATA` 是一个不存在的路径。**
-2. **`registry/agents.yaml` 未记录 `projects/` 与入口文件**：`claude` / `codex` 声明了 `skillMode: symlink`，但 `cursor` / `deepseek` 无此字段，与 §10 的表格一致，属待补而非错误。
+1. 原 `AIHUB_DATA` 不存在的结论已失效：外部目录及 §1 列出的子目录均存在，仅核对路径，未读取私有内容。
+2. `README.md`、Agent 入口、Profile 和脚本中的部分章节号及状态描述已过期；例如入口仍称配置为占位。按本文件的章节标题与实际文件核对，不据旧编号推导规则。
+3. `registry/rules.yaml` 仍引用空的 `security/secrets.md`，证明历史索引不能替代源检查；`registry/agents.yaml` 的 cursor / deepseek 未声明 `skillMode`，安装器会跳过其技能联接。
+4. `docs/` 下文档及根目录结构草稿不作为当前目录事实源；结构以实际扫描为准，生成物按 §14 处理。
 
-### 因此
-
-- 查不到某条规则 = 它还没写，**如实说明并按 L0 原则行事，禁止编造规则内容**；
-- 引用前先验证目标文件存在且非空；
-- 本节内容过期后应更新或删除。
+查不到规则或只找到占位时，如实报告并按 L0 与本契约执行。仅在本次任务授权范围内更新关联文件；其余漂移留待后续任务。
